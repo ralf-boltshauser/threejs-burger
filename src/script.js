@@ -27,11 +27,14 @@ gltfLoader.setDRACOLoader(dracoLoader)
 
 let mixer = null
 
+let model = null
+
 gltfLoader.load(
     '/models/hamburger.glb',
     (gltf) =>
     {
-        scene.add(gltf.scene)
+        model = gltf.scene;
+        scene.add(model)
     }
 )
 
@@ -95,7 +98,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(0, 4, 16)
+camera.position.set(0, 8, 16)
 scene.add(camera)
 
 // Controls
@@ -130,10 +133,12 @@ const tick = () =>
     }
 
     // rotate camera around object
-    camera.position.x = Math.sin(mouse.x * 3) * 10
-    camera.position.z = Math.cos(mouse.x * 3) * 10
-    camera.position.y = (mouse.y ) * 10
-    
+    if (model) {
+        model.rotation.y = mouse.x * 1 + elapsedTime * 0.5
+        model.rotation.x = mouse.y * 1
+        model.rotation.z = (mouse.x + mouse.y) * 1         
+    }
+
     camera.lookAt(new THREE.Vector3())
 
     // Update controls
