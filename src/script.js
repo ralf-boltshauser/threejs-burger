@@ -9,7 +9,6 @@ import * as dat from 'dat.gui'
  * Base
  */
 // Debug
-const gui = new dat.GUI()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -39,7 +38,7 @@ gltfLoader.load(
 /**
  * Floor
  */
-const floor = new THREE.Mesh(
+/* const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(50, 50),
     new THREE.MeshStandardMaterial({
         color: '#444444',
@@ -50,7 +49,7 @@ const floor = new THREE.Mesh(
 floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
 scene.add(floor)
-
+ */
 /**
  * Lights
  */
@@ -96,31 +95,29 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(- 8, 4, 8)
+camera.position.set(0, 4, 16)
 scene.add(camera)
 
 // Controls
-const controls = new OrbitControls(camera, canvas)
-controls.target.set(0, 1, 0)
-controls.enableDamping = true
 
 /**
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+    canvas: canvas,
+    alpha: true
 })
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
+renderer.setClearColor(0x000000, 0);
 /**
  * Animate
  */
 const clock = new THREE.Clock()
 let previousTime = 0
-
+let mouse = new THREE.Vector2()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
@@ -132,14 +129,29 @@ const tick = () =>
         mixer.update(deltaTime)
     }
 
+    // rotate camera around object
+    camera.position.x = Math.sin(mouse.x * 3) * 10
+    camera.position.z = Math.cos(mouse.x * 3) * 10
+    camera.position.y = (mouse.y ) * 10
+    
+    camera.lookAt(new THREE.Vector3())
+
     // Update controls
-    controls.update()
+
+
 
     // Render
     renderer.render(scene, camera)
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
+    
 }
+
+// update mouse position    
+document.addEventListener('mousemove', (event) => {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+})
 
 tick()
