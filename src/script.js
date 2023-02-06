@@ -27,14 +27,14 @@ gltfLoader.setDRACOLoader(dracoLoader)
 
 let mixer = null
 
-let model = null
+let models = []
 
 gltfLoader.load(
     '/models/hamburger.glb',
     (gltf) =>
     {
-        model = gltf.scene;
-        scene.add(model)
+        models.push(gltf.scene);
+        scene.add(models[0])
     }
 )
 
@@ -133,11 +133,18 @@ const tick = () =>
     }
 
     // rotate camera around object
-    if (model) {
-        model.rotation.y = mouse.x * 1 + elapsedTime * 0.5
-        model.rotation.x = mouse.y * 1
-        model.rotation.z = (mouse.x + mouse.y) * 1         
-    }
+    models.forEach((model, index) => {
+        if (model) {
+            model.rotation.y = mouse.x * 1 + elapsedTime * 0.5
+            model.rotation.x = mouse.y * 1
+            model.rotation.z = (mouse.x + mouse.y) * 1         
+            model.position.x = Math.sin(elapsedTime * index) * index * 2
+            model.position.y = Math.cos(elapsedTime * index) * index * 2
+            
+         
+         }
+
+    });
 
     camera.lookAt(new THREE.Vector3())
 
@@ -157,6 +164,15 @@ const tick = () =>
 document.addEventListener('mousemove', (event) => {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+})
+
+document.addEventListener("click", (event) => {
+    let clone = models[0].clone();
+    clone.position.z = -5 * models.length;
+    clone.position.y = 0;
+    clone.position.x = 0; 
+    models.push(clone); 
+    scene.add(clone);
 })
 
 tick()
